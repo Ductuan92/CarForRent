@@ -1,0 +1,10 @@
+/vendor/
+/.idea/
+/phpcbf.phar/
+/phpcs.phar/
+/phpunit.phar/
+/composer.phar/
+.DS_Store
+.env
+/phpunit.xml
+/phpunit.xml.bak
