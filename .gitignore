@@ -5,6 +5,7 @@
 /phpunit.phar/
 /composer.phar/
 .DS_Store
-.env
+/src/.env
 /phpunit.xml
-/phpunit.xml.bak
+/.phpunit.cache
+/coverage

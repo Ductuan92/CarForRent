@@ -2,35 +2,33 @@
 
 namespace MyApp\Controller;
 
-use MyApp\Database\Database;
-
 use MyApp\request\UserLoginRequest;
-use PDO;
 use MyApp\App\View;
 use MyApp\Repository\UserRepository;
 use Exception;
-use MyApp\App\Container;
-use MyApp\Validation\UserLoginValidation;
+use MyApp\service\LoginService;
+use MyApp\Validation\UserLoginVerify;
+use MyApp\Validation\UserRequestValidation;
+use MyApp\model\User;
 
 class LoginController
 {
-    /**
-     * @var PDO
-     */
-    protected PDO $connection;
+    private LoginService $loginService;
+    private UserLoginRequest $userLoginRequest;
+    private UserRequestValidation $userRequestValidation;
 
     /**
-     * @var Container
+     * @param LoginService $loginService
      */
-    private Container $container;
-
-    /**
-     * @param $connection
-     */
-    public function __construct()
+    public function __construct(
+        LoginService $loginService,
+        UserLoginRequest $userLoginRequest,
+        UserRequestValidation $userRequestValidation
+    )
     {
-        $this->connection = Database::databaseConnection();
-        $this->container = new Container();
+        $this->loginService = $loginService;
+        $this->userLoginRequest = $userLoginRequest;
+        $this->userRequestValidation = $userRequestValidation;
     }
 
     /**
@@ -38,8 +36,7 @@ class LoginController
      */
     public function index(): void
     {
-        View::render('login');
-        if (empty($_SESSION["userID"]))
+        if (!empty($_SESSION["userID"]))
             View::render('index');
         else
             View::render('login');
@@ -51,11 +48,17 @@ class LoginController
      */
     public function login(): void
     {
-        $userRequest = $this->container->make(UserLoginRequest::class);
-        $userTransfer = $userRequest->getUser();
-        $_SESSION['userID'] = $userTransfer->getId();
+        //validate request
+        $message = $this->userRequestValidation->validateEmptyUserNamePassword($this->userLoginRequest);
+        if ($message != [])
+            View::render('login', $message);
 
-        View::render('index');
+        $user = $this->loginService->Login($this->userLoginRequest);
+        if ($user)
+        {
+            $_SESSION["userID"] = $user->getId();
+            View::render('index');
+        }
     }
 
     /**
@@ -63,8 +66,8 @@ class LoginController
      */
     public function logout(): void
     {
-        View::render('login');
         session_unset();
         session_destroy();
+        View::render('login');
     }
 }

@@ -4,6 +4,7 @@ namespace MyApp\App;
 
 use MyApp\Controller\HomeController;
 use MyApp\Controller\LoginController;
+use MyApp\Controller\PageNotFoundController;
 use MyApp\Http\Request;
 
 class Route
@@ -46,14 +47,15 @@ class Route
     /**
      * @return bool
      */
-    public function getRoute(): bool
+    public function getRoute()
     {
         $routes = array(
             array('GET','/',HomeController::class,'index'),
             array('GET','/index',HomeController::class,'index'),
             array('GET','/user/login',LoginController::class,'index'),
             array('POST','/user/login',LoginController::class,'login'),
-            array('POST','/logout',LoginController::class,'logout')
+            array('POST','/logout',LoginController::class,'logout'),
+            array('GET','/logout',LoginController::class,'login')
         );
 
         foreach ($routes as $route)
@@ -64,7 +66,6 @@ class Route
                 $this->setRoute($method, $uri, $controller, $action);
             }
         }
-        View::render('PageNotFound');
     }
 
     /**
@@ -88,6 +89,8 @@ class Route
      */
     public function getControllerClassName(): string
     {
+        if(empty($this->controllerClassName))
+            return PageNotFoundController::class;
         return $this->controllerClassName;
     }
 
@@ -96,6 +99,8 @@ class Route
      */
     public function getActionName(): string
     {
+        if(empty($this->actionName))
+            return 'PageNotFound';
         return $this->actionName;
     }
 

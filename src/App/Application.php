@@ -3,7 +3,6 @@
 namespace MyApp\App;
 
 use MyApp\Http\Request;
-use MyApp\App\RouteConfig;
 use MyApp\Controller\HomeController;
 use MyApp\Controller\LoginController;
 

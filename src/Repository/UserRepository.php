@@ -31,7 +31,7 @@ class UserRepository
         $statement->execute([$userName]);
 
         try {
-            if ($row = $statement->fetch()) {;
+            if ($row = $statement->fetch()) {
                 return $row;
             }
         }
