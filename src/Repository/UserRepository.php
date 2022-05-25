@@ -3,10 +3,12 @@
 namespace MyApp\Repository;
 
 use MyApp\Database\Database;
+use MyApp\model\User;
 use PDO;
 
 class UserRepository
 {
+    private User $user;
     /**
      * @var PDO
      */
@@ -15,8 +17,9 @@ class UserRepository
     /**
      * @param $connection
      */
-    public function __construct()
+    public function __construct(User $user)
     {
+        $this->user = new User();
         $this->connection = Database::databaseConnection();
     }
 
@@ -32,11 +35,37 @@ class UserRepository
 
         try {
             if ($row = $statement->fetch()) {
-                return $row;
+                $this->user->setId($row['id']);
+                $this->user->setUserName($row['user_name']);
+                $this->user->setPassword($row['password']);
+                $this->user->setEmail($row['email']);
+                $this->user->setRole($row['role']);
+                return $this->user;
             }
         }
         finally{
                 $statement->closeCursor();
             }
+    }
+
+    public function searchById($id)
+    {
+
+        $statement = $this->connection->prepare("SELECT * FROM user WHERE id = ? ");
+        $statement->execute([$id]);
+
+        try {
+            if ($row = $statement->fetch()) {
+                $this->user->setId($row['id']);
+                $this->user->setUserName($row['user_name']);
+                $this->user->setPassword($row['password']);
+                $this->user->setEmail($row['email']);
+                $this->user->setRole($row['role']);
+                return $this->user;
+            }
+        }
+        finally{
+            $statement->closeCursor();
+        }
     }
 }

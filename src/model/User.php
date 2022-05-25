@@ -5,6 +5,27 @@ namespace MyApp\model;
 class User
 {
     /**
+     * @var string
+     */
+    private string $role;
+
+    /**
+     * @return string
+     */
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    /**
+     * @param string $role
+     */
+    public function setRole(string $role): void
+    {
+        $this->role = $role;
+    }
+
+    /**
      * @var int
      */
     private int  $id;

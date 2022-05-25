@@ -9,3 +9,4 @@
 /phpunit.xml
 /.phpunit.cache
 /coverage
+.phpunit.result.cache

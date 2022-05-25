@@ -4,7 +4,6 @@ namespace MyApp\request;
 
 use http\Exception;
 use MyApp\App\View;
-use MyApp\Exception\ValidationException;
 use MyApp\Repository\UserRepository;
 use MyApp\model\User;
 

@@ -10,11 +10,13 @@ class UserRequestValidation
      */
     public function validateEmptyUserNamePassword($userRequest): array
     {
-        if(empty($userRequest->getUserName()) || empty($userRequest->getPassword()))
+        if(empty($userRequest->getUserName()) || empty($userRequest->getPassword())){
             return [
                 'login'=>'user name and password must not empty'
             ];
-        else
+        }
+        else{
             return [];
+        }
     }
 }

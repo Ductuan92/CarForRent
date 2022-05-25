@@ -47,11 +47,24 @@ class UserTest extends TestCase
      * @param $expected
      * @return void
      */
-    public function testEmail($param, $expected){
+    public function testGetEmail($param, $expected){
         $user = new User();
         $user->setEmail($param['email']);
         $result = $user->getEmail();
         $this->assertEquals($result,$expected['email']);
+    }
+
+    /**
+     * @dataProvider userDataProvider
+     * @param $param
+     * @param $expected
+     * @return void
+     */
+    public function testGetRole($param, $expected){
+        $user = new User();
+        $user->setRole($param['role']);
+        $result = $user->getRole();
+        $this->assertEquals($expected['role'], $result);
     }
 
     public function userDataProvider()
@@ -62,13 +75,15 @@ class UserTest extends TestCase
                     'id'=>'1',
                     'username'=>'An',
                     'password'=>'dank',
-                    'email'=>'an@gmail.com'
+                    'email'=>'an@gmail.com',
+                    'role'=>'admin'
                 ],
                 'expected'=>[
                     'id'=>'1',
                     'username'=>'An',
                     'password'=>'dank',
-                    'email'=>'an@gmail.com'
+                    'email'=>'an@gmail.com',
+                    'role'=>'admin'
                 ]
             ]
         ];

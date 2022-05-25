@@ -9,8 +9,9 @@ class HomeController
     /**
      * @return void
      */
-    public function index(): void
+    public function index(): bool
     {
         View::render('index');
+        return true;
     }
 }

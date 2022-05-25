@@ -9,8 +9,9 @@ class PageNotFoundController
     /**
      * @return bool
      */
-    public function PageNotFound()
+    public function PageNotFound(): bool
     {
         View::render('PageNotFound');
+        return true;
     }
 }
