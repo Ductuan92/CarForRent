@@ -10,35 +10,37 @@ use MyApp\model\User;
 class UserLoginRequest
 {
 
-    private $userName;
-    private $password;
+    private string $userName;
+    private string $password;
 
-    public function __construct()
-    {
-        $this->userName = $_POST['userName']??"";
-        $this->password = $_POST['password']??"";
-    }
-
-    public function getUserName()
+    /**
+     * @return string
+     */
+    public function getUserName(): string
     {
         return $this->userName;
     }
 
-    public function getPassword()
+    /**
+     * @return string
+     */
+    public function getPassword(): string
     {
         return $this->password;
     }
 
     /**
-     * @param mixed|string $userName
+     * @param $userName
+     * @return void
      */
-    public function setUserName(mixed $userName): void
+    public function setUserName($userName): void
     {
         $this->userName = $userName;
     }
 
     /**
-     * @param mixed|string $password
+     * @param mixed $password
+     * @return void
      */
     public function setPassword(mixed $password): void
     {

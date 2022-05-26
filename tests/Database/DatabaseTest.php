@@ -13,18 +13,4 @@ class DatabaseTest extends TestCase
         $connection = Database::databaseConnection();
         $this->assertNotNull($connection);
     }
-
-    /**
-     * @runInSeparateProcess
-     * @return void
-     */
-//    public function testDatabaseFalse()
-//    {
-//        Database::databaseConnection();
-//        Database::$pdo = ['DB_DSN'=>'mysql:host=localhost;dbname=db',
-//            'DB_USERNAME'=>'anh',
-//            'DB_PASSWORD'=>'daa'];
-//        $this->expectException(PDOException::class);
-//        $connection = Database::databaseConnection();
-//    }
 }

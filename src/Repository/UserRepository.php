@@ -8,7 +8,6 @@ use PDO;
 
 class UserRepository
 {
-    private User $user;
     /**
      * @var PDO
      */
@@ -17,55 +16,59 @@ class UserRepository
     /**
      * @param $connection
      */
-    public function __construct(User $user)
+    public function __construct()
     {
-        $this->user = new User();
         $this->connection = Database::databaseConnection();
     }
 
     /**
      * @param $userName
-     * @return mixed|void
+     * @return User|null
      */
-    public function searchByUserName($userName)
+    public function searchByUserName($userName): User|null
     {
 
         $statement = $this->connection->prepare("SELECT * FROM user WHERE user_name = ? ");
         $statement->execute([$userName]);
+        $row = $statement->fetch();
+        $statement->closeCursor();
 
-        try {
-            if ($row = $statement->fetch()) {
-                $this->user->setId($row['id']);
-                $this->user->setUserName($row['user_name']);
-                $this->user->setPassword($row['password']);
-                $this->user->setEmail($row['email']);
-                $this->user->setRole($row['role']);
-                return $this->user;
-            }
+        if($row){
+            return $this->setUser($row);
         }
-        finally{
-                $statement->closeCursor();
-            }
+        return null;
     }
 
-    public function searchById($id)
+    /**
+     * @param $id
+     * @return User|null
+     */
+    public function searchById($id): User|null
     {
 
         $statement = $this->connection->prepare("SELECT * FROM user WHERE id = ? ");
         $statement->execute([$id]);
+        $row = $statement->fetch();
+        $statement->closeCursor();
 
-        try {
-            if ($row = $statement->fetch()) {
-                $this->user->setId($row['id']);
-                $this->user->setUserName($row['user_name']);
-                $this->user->setPassword($row['password']);
-                $this->user->setEmail($row['email']);
-                $this->user->setRole($row['role']);
-                return $this->user;
-            }
+        if($row){
+            return $this->setUser($row);
         }
-        finally{
-            $statement->closeCursor();
-        }
+        return null;
+    }
+
+    /**
+     * @param $row
+     * @return User
+     */
+    private function setUser($row):User
+    {
+        $user = new User();
+        $user->setId($row['id']);
+        $user->setUserName($row['user_name']);
+        $user->setPassword($row['password']);
+        $user->setEmail($row['email']);
+        $user->setRole($row['role']);
+        return $user;
     }
 }

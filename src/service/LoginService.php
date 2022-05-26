@@ -17,17 +17,23 @@ class LoginService
     }
 
     /**
-     * @return void
-     * @throws \ReflectionException
+     * @param $userRequest
+     * @return User|null
      */
     public function Login($userRequest): User|null
     {
         $user = $this->userRepository->searchByUserName($userRequest->getUserName());
-        if($user and password_verify($userRequest->getPassword(), $user->getPassword())){
+        if($user && $this->verifyPassword($userRequest->getPassword(), $user->getPassword())){
             return $user;
         }
-        else{
-            return null;
+        return null;
+    }
+
+    private function verifyPassword($plainPassword, $password): bool
+    {
+        if(password_verify($plainPassword, $password)){
+            return True;
         }
+        return false;
     }
 }

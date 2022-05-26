@@ -19,10 +19,10 @@ class LoginController
      * @param LoginService $loginService
      */
     public function __construct(
-        LoginService $loginService,
-        UserLoginRequest $userLoginRequest,
+        LoginService          $loginService,
+        UserLoginRequest      $userLoginRequest,
         UserRequestValidation $userRequestValidation,
-        Session $session
+        Session               $session
     )
     {
         $this->loginService = $loginService;
@@ -36,11 +36,10 @@ class LoginController
      */
     public function index(): bool
     {
-        if (!empty($_SESSION["userID"])){
+        if (!empty($_SESSION["userID"])) {
             View::render('index');
             return true;
-        }
-        else {
+        } else {
             View::render('login');
             return false;
         }
@@ -52,26 +51,30 @@ class LoginController
      */
     public function login(): bool
     {
-        //validate request
-        $message = $this->userRequestValidation->validateEmptyUserNamePassword($this->userLoginRequest);
-        if ($message == [])
-        {
-            View::render('login', $message);
-            return false;
-        }
+        $this->checkUserRequest();
         $user = $this->loginService->Login($this->userLoginRequest);
-        if ($user == null){
-            View::render('login',[
-                'login'=>'user or password is incorrect'
+        if ($user == null) {
+            View::render('login', [
+                'login' => 'user or password is incorrect'
             ]);
             return false;
         }
-        else
-        {
-            $this->session->setSessionId($user->getId());
-            View::render('index');
-            echo $user->getUserName();
-            return true;
+        $this->session->setSessionId($user->getId());
+        View::redirect('/');
+        return true;
+    }
+
+    /**
+     * @return false|void
+     */
+    private function checkUserRequest()
+    {
+        $this->userLoginRequest->setUserName($_POST['userName']);
+        $this->userLoginRequest->setPassword($_POST['password']);
+        $message = $this->userRequestValidation->validateEmptyUserNamePassword($this->userLoginRequest);
+        if ($message != []) {
+            View::render('login', $message);
+            return false;
         }
     }
 

@@ -7,24 +7,30 @@ use PHPUnit\Framework\TestCase;
 
 class UserLoginRequestTest extends TestCase
 {
-    public function testGetUserName()
+    /**
+     * @dataProvider UserRequestDataProvider
+     * @return void
+     */
+    public function testGetUserName($param)
     {
-        $_POST['userName'] = 'an';
-        $_POST['password'] = '12dsa';
-
         $userRequest = new UserLoginRequest();
+        $userRequest->setUserName($param['userName']);
+        $userRequest->setPassword($param['password']);
         $result = $userRequest->getUserName();
-        $this->assertEquals('an', $result);
+        $this->assertEquals($param['userName'], $result);
     }
 
-    public function testGetPassword()
+    /**
+     * @dataProvider UserRequestDataProvider
+     * @return void
+     */
+    public function testGetPassword($param)
     {
-        $_POST['userName'] = 'an';
-        $_POST['password'] = '12dsa';
-
         $userRequest = new UserLoginRequest();
+        $userRequest->setUserName($param['userName']);
+        $userRequest->setPassword($param['password']);
         $result = $userRequest->getPassword();
-        $this->assertEquals('12dsa', $result);
+        $this->assertEquals($param['password'], $result);
     }
 
     public function testSetPassword()
@@ -41,5 +47,17 @@ class UserLoginRequestTest extends TestCase
         $userRequest->setUserName('banh');
         $result = $userRequest->getUserName();
         $this->assertEquals('banh', $result);
+    }
+
+    public function UserRequestDataProvider()
+    {
+        return [
+            'happy-case-1'=>[
+                'param'=>[
+                    'userName'=> 'anh',
+                    'password'=>'1234'
+                ]
+            ],
+        ];
     }
 }

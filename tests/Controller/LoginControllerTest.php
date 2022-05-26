@@ -30,37 +30,41 @@ class LoginControllerTest extends TestCase
         $loginController = new LoginController($loginService, $userLoginRequest, $userRequestValidation, $session);
         $result = $loginController->index();
 
-        $this->assertEquals($expected,$result);
+        $this->assertEquals($expected, $result);
     }
 
     public function indexDataProvider()
     {
         return [
-            'happy-case-1'=>[
-                'param'=>[
+            'happy-case-1' => [
+                'param' => [
                     'id' => '123'
                 ],
-                'expected'=>true
+                'expected' => true
             ],
-            'unhappy-case-1'=>[
-                'param'=>[
+            'unhappy-case-1' => [
+                'param' => [
                     'id' => ''
                 ],
-                'expected'=>false
+                'expected' => false
             ]
         ];
     }
 
     /**
+     * @runInSeparateProcess
      * @dataProvider loginDataProvider
      * @return void
      * @throws \ReflectionException
      */
-    public function testLogin($param)
+    public function testLogin($param): void
     {
         $user = new User();
-        $user->setUserName('anh');
-        $user->setId('1234');
+        $user->setId($param['id']);
+        $_POST['userName'] = $param['userName'];
+        $_POST['password'] = $param['password'];
+//        $user->setUserName($param['userName']);
+//        $user->setPassword($param['password']);
         $loginServiceMock = $this->getMockBuilder(LoginService::class)->disableOriginalConstructor()->getMock();
         $loginServiceMock->expects($this->once())->method('Login')->willReturn($user);
 
@@ -77,12 +81,13 @@ class LoginControllerTest extends TestCase
     public function loginDataProvider()
     {
         return [
-            'happy-case-1'=>[
-                'param'=>[
-                    'userName'=>'anh',
-                    'password'=>'1234',
-                    'method'=>'POST',
-                    'uri'=>'/user/login'
+            'happy-case-1' => [
+                'param' => [
+                    'id' => '1',
+                    'userName' => 'anh',
+                    'password' => '1234',
+                    'method' => 'POST',
+                    'uri' => '/user/login'
                 ]
             ]
         ];
@@ -99,7 +104,6 @@ class LoginControllerTest extends TestCase
         $_POST['password'] = $param['password'];
         $_SERVER['REQUEST_URI'] = $param['uri'];
         $_SERVER['REQUEST_METHOD'] = $param['method'];
-        $_SERVER['REQUEST_URI'] = $param['uri'];
         $user = new User();
         $userRepository = new UserRepository($user);
         $loginService = new LoginService($userRepository);
@@ -116,24 +120,25 @@ class LoginControllerTest extends TestCase
     public function loginFalseDataProvider()
     {
         return [
-            'happy-case-1'=>[
-                'param'=>[
-                    'userName'=>'',
-                    'password'=>'1234',
-                    'method'=>'POST',
-                    'uri'=>'/user/login'
+            'happy-case-1' => [
+                'param' => [
+                    'userName' => '',
+                    'password' => '1234',
+                    'method' => 'POST',
+                    'uri' => '/user/login'
                 ]
             ],
-            'happy-case-2'=>[
-                'param'=>[
-                    'userName'=>'anh',
-                    'password'=>'12345',
-                    'method'=>'POST',
-                    'uri'=>'/user/login'
+            'happy-case-2' => [
+                'param' => [
+                    'userName' => 'anh',
+                    'password' => '12345',
+                    'method' => 'POST',
+                    'uri' => '/user/login'
                 ]
             ]
         ];
     }
+
     /**
      * @runInSeparateProcess
      * @return void
@@ -151,7 +156,7 @@ class LoginControllerTest extends TestCase
         $userRequestValidation = new UserRequestValidation();
         $loginController = new LoginController($loginService, $userLoginRequest, $userRequestValidation, $session);
         $loginController->logout();
-        $expected = array_key_exists('userID',$_SESSION);
+        $expected = array_key_exists('userID', $_SESSION);
 
         $this->assertFalse($expected);
     }

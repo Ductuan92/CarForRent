@@ -48,22 +48,20 @@ class Route
     /**
      * @return bool
      */
-    public function getRoute():bool
+    public function getRoute(): bool
     {
         $routes = array(
-            array('GET','/',HomeController::class,'index'),
-            array('GET','/index',HomeController::class,'index'),
-            array('GET','/user/login',LoginController::class,'index'),
-            array('POST','/user/login',LoginController::class,'login'),
-            array('POST','/logout',LoginController::class,'logout'),
-            array('GET','/logout',LoginController::class,'login'),
+            array('GET', '/', HomeController::class, 'index'),
+            array('GET', '/index', HomeController::class, 'index'),
+            array('GET', '/user/login', LoginController::class, 'index'),
+            array('POST', '/user/login', LoginController::class, 'login'),
+            array('POST', '/logout', LoginController::class, 'logout'),
+            array('GET', '/logout', LoginController::class, 'login'),
 
         );
 
-        foreach ($routes as $route)
-        {
-            if($route[0] == Request::requestMethod() && $route[1] == Request::requestUri())
-            {
+        foreach ($routes as $route) {
+            if ($route[0] == Request::requestMethod() && $route[1] == Request::requestUri()) {
                 list($method, $uri, $controller, $action) = $route;
                 $this->setRoute($method, $uri, $controller, $action);
             }
@@ -92,12 +90,10 @@ class Route
      */
     public function getControllerClassName(): string
     {
-        if(empty($this->controllerClassName)){
-            return PageNotFoundController::class;
+        if (empty($this->controllerClassName)) {
+            $this->controllerClassName = PageNotFoundController::class;
         }
-        else{
-            return $this->controllerClassName;
-        }
+        return $this->controllerClassName;
     }
 
     /**
@@ -105,12 +101,10 @@ class Route
      */
     public function getActionName(): string
     {
-        if(empty($this->actionName)){
-            return 'PageNotFound';
+        if (empty($this->actionName)) {
+            $this->actionName = 'PageNotFound';
         }
-        else{
-            return $this->actionName;
-        }
+        return $this->actionName;
     }
 
 }

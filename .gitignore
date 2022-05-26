@@ -9,4 +9,5 @@
 /phpunit.xml
 /.phpunit.cache
 /coverage
-.phpunit.result.cache
+/.phpunit.result.cache
+/psalm.xml

@@ -9,7 +9,7 @@ class View
      * @param array $data
      * @return void
      */
-    public static function render($view, array $data=[]): void
+    public static function render($view, array $data = []): void
     {
         require __DIR__ . "/../view/layout/header.php";
         require __DIR__ . "/../view/" . $view . ".php";

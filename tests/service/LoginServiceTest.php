@@ -19,9 +19,9 @@ class LoginServiceTest extends TestCase
      */
     public function testLogin($param)
     {
-        $_POST['userName'] = $param['userName'];
-        $_POST['password'] = $param['password'];
         $userRequest = new UserLoginRequest();
+        $userRequest->setUserName($param['userName']);
+        $userRequest->setPassword($param['password']);
         $user = new User();
         $userRepository = new UserRepository($user);
 
@@ -50,9 +50,9 @@ class LoginServiceTest extends TestCase
      */
     public function testLoginFalse($param)
     {
-        $_POST['userName'] = $param['userName'];
-        $_POST['password'] = $param['password'];
         $userRequest = new UserLoginRequest();
+        $userRequest->setUserName($param['userName']);
+        $userRequest->setPassword($param['password']);
         $user = new User();
         $userRepository = new UserRepository($user);
 

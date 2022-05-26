@@ -1,6 +1,7 @@
 <?php
 
 namespace MyApp\App;
+
 use Closure;
 use Exception;
 use ReflectionClass;
