@@ -23,6 +23,37 @@ class Request
      */
     public static function requestUri()
     {
-        return $_SERVER['REQUEST_URI'];
+        $path = $_SERVER['REQUEST_URI'];
+        $position = strpos($path, '?');
+
+        if ($position === false) {
+            return $path;
+        }
+
+        return substr($path, 0, $position);
+    }
+    public function getRequestBody()
+    {
+        return file_get_contents('php://input');
+    }
+
+    public function getRequestJsonBody()
+    {
+        $data = file_get_contents('php://input');
+
+        return json_decode($data, true);
+    }
+
+    public function getTokenHeader()
+    {
+        return $_SERVER['HTTP_AUTHORIZATION'] ?? null;
+    }
+
+    public function getParams()
+    {
+        $path = $_SERVER['REQUEST_URI'];
+        $pathComponents = parse_url($path);
+        parse_str($pathComponents['query'], $params);
+        return $params;
     }
 }

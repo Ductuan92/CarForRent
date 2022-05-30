@@ -5,6 +5,8 @@ namespace MyApp\App;
 use MyApp\Http\Request;
 use MyApp\Controller\HomeController;
 use MyApp\Controller\LoginController;
+use MyApp\Http\Response;
+use MyApp\Middleware\AclMiddleware;
 
 class Application
 {
@@ -12,16 +14,25 @@ class Application
      * @return bool
      * @throws \ReflectionException
      */
-    public function start(): bool
+    public function start()
     {
         $container = new Container();
-        $route = $container->make(Route::class);
-        $route->getRoute();
+        $routeConfig = $container->make(Route::class);
+        $route = $routeConfig->getRoute();
+
+        if($route == null){
+            View::render('PageNotFound');
+            return false;
+        }
+        $acl = $container->make(AclMiddleware::class);
+        $acl->verify($route);
 
         $actionName = $route->getActionName();
         $controllerClassName = $route->getControllerClassName();
         $controller = $container->make($controllerClassName);
-        $controller->$actionName();
-        return true;
+        $respond = $controller->$actionName();
+        if($respond) {
+            View::handle($respond);
+        }
     }
 }

@@ -11,11 +11,12 @@
   },
   "require": {
     "vlucas/phpdotenv": "^5.4",
-    "composer/xdebug-handler": "^3.0"
+    "firebase/php-jwt": "^6.2",
+    "ext-pdo": "*"
   },
   "require-dev": {
+    "composer/xdebug-handler": "^3.0",
     "phpunit/phpunit": "^9",
-    "ext-pdo": "*",
     "vimeo/psalm": "^4.23"
   }
 }

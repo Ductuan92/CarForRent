@@ -4,26 +4,13 @@ namespace MyApp\model;
 
 class User
 {
+    public const ROLE_GUEST = 'quest';
+    public const ROLE_MEMBER = 'member';
+    public const ROLE_ADMIN = 'admin';
     /**
      * @var string
      */
     private string $role;
-
-    /**
-     * @return string
-     */
-    public function getRole(): string
-    {
-        return $this->role;
-    }
-
-    /**
-     * @param string $role
-     */
-    public function setRole(string $role): void
-    {
-        $this->role = $role;
-    }
 
     /**
      * @var int
@@ -112,4 +99,21 @@ class User
     {
         $this->email = $email;
     }
+
+    /**
+     * @return string
+     */
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    /**
+     * @param string $role
+     */
+    public function setRole(string $role): void
+    {
+        $this->role = $role;
+    }
+
 }

@@ -28,7 +28,7 @@ class UserRepository
     public function searchByUserName($userName): User|null
     {
 
-        $statement = $this->connection->prepare("SELECT * FROM user WHERE user_name = ? ");
+        $statement = $this->connection->prepare("SELECT * FROM user WHERE username = ? ");
         $statement->execute([$userName]);
         $row = $statement->fetch();
         $statement->closeCursor();
@@ -65,7 +65,7 @@ class UserRepository
     {
         $user = new User();
         $user->setId($row['id']);
-        $user->setUserName($row['user_name']);
+        $user->setUserName($row['username']);
         $user->setPassword($row['password']);
         $user->setEmail($row['email']);
         $user->setRole($row['role']);
