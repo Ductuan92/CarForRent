@@ -9,6 +9,7 @@ use MyApp\Repository\UserRepository;
 use MyApp\service\LoginService;
 use MyApp\service\TokenService;
 use MyApp\Exception\UnauthorizedException;
+use mysql_xdevapi\Exception;
 
 class AclMiddleware
 {
@@ -34,8 +35,6 @@ class AclMiddleware
 
     public function verify(Route $route): bool
     {
-        $uri = substr(Request::requestUri(), 1, 3);
-
         $role = $route->getRole();
         if(empty($role)){
             return true;
@@ -45,7 +44,12 @@ class AclMiddleware
             $this->checkToken($role);
             return true;
         }
-        $this->checkSession($role);
+        try{
+            $this->checkSession($role);
+        } catch(\Exception $exception){
+            echo $exception->getMessage();
+            return false;
+        }
         return true;
     }
 
@@ -58,7 +62,7 @@ class AclMiddleware
         if ($user->getRole() === $role) {
             return true;
         }
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('User are not permitted');
     }
     private function checkSession($role): bool
     {
@@ -68,9 +72,7 @@ class AclMiddleware
             if($user->getRole() == $role){
                 return true;
             }
-            throw new UnauthorizedException();
         }
-        View::render('login');
-        return false;
+        throw new UnauthorizedException('User are not permitted');
     }
 }

@@ -30,7 +30,10 @@ class Application
             $actionName = $route->getActionName();
             $controllerClassName = $route->getControllerClassName();
             $acl = $container->make(AclMiddleware::class);
-            $acl->verify($route);
+            $verify = $acl->verify($route);
+            if(!$verify){
+                return false;
+            }
         }
 
         $controller = $container->make($controllerClassName);

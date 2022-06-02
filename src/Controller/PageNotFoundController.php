@@ -12,7 +12,6 @@ class PageNotFoundController extends AbstractController
      */
     public function pageNotFound(): Response
     {
-        var_dump($this->response->view('PageNotFound'));
         return $this->response->view('PageNotFound');
     }
 }

@@ -59,7 +59,7 @@ class CarController extends AbstractController
      */
     private function upLoad($param, $carImg): array
     {
-        $result = $this->fileService->handleUpload($carImg);
+        $result = $this->fileService->UploadToS3($carImg);
         if(isset($result['error'])){
             return $result;
 
@@ -88,7 +88,6 @@ class CarController extends AbstractController
      */
     public function index(){
         $cars = $this->carRepository->getAllCar();
-        $this->response->setOption($cars);
-        return $this->response->view('index');
+        return $this->response->view('index', $cars);
     }
 }

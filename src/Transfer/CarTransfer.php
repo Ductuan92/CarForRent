@@ -78,7 +78,7 @@ class CarTransfer implements TransferInterface
 
     public function fromArray(array $param): TransferInterface
     {
-        $this->id = $param['id'] ?? null;
+        //$this->id = $param['id'] ?? null;
         $this->brand = $param['brand'] ?? null;
         $this->price = $param['price'] ?? null;
         $this->description = $param['description'] ?? null;

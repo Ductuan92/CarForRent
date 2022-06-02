@@ -10,7 +10,7 @@ class FileService
 {
     private static $loadEnv;
 
-    public function handleUpload($file)
+    public function UploadToS3($file)
     {
         self::$loadEnv = Dotenv::createImmutable( '../src');
         self::$loadEnv->load();
@@ -43,7 +43,7 @@ class FileService
         if (!array_key_exists($ext, $allowed)) {
             return ['error' => 'Please select a valid file format'];
         }
-        $maxsize = 10 * 1024 * 1024;
+        $maxsize = 10 * 2024 * 2024;
 
         if ($filesize > $maxsize) {
             return ['error' => 'File size is larger than the allowed limit'];
