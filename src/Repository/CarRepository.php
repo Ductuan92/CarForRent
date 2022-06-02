@@ -2,20 +2,35 @@
 
 namespace MyApp\Repository;
 
+use MyApp\Database\Database;
 use MyApp\model\Car;
+use MyApp\Transfer\CarTransfer;
 use PDO;
 
 class CarRepository
 {
     private Car $car;
-    private PDO $connection;
+    private ?PDO $connection;
 
     /**
      * @param PDO $connection
      */
-    public function __construct(PDO $connection)
+    public function __construct()
     {
-        $this->connection = $connection;
+        $this->connection = Database::databaseConnection();
+    }
+
+    public function getAllCar(): array
+    {
+        $statement = $this->connection->prepare("SELECT * FROM cars");
+        $statement->execute();
+        $rows = $statement->fetchAll();
+        $statement->closeCursor();
+        $cars = [];
+        foreach ($rows as $row){
+            array_push($cars, $this->setCar($row));
+        }
+        return $cars;
     }
 
     public function searchById($id): Car|null
@@ -31,17 +46,15 @@ class CarRepository
         return null;
     }
 
-    public function createCar($id, $brand, $price, $description, $date)
+    public function createCar(CarTransfer $car): array
     {
-        $statement = $this->connection->prepare("INSERT INTO cars (id, brand, price, description, date) VALUES ?");
-        $statement->execute([$id, $brand, $price, $description, $date]);
-        if ($this->connection->query($statement) === TRUE) {
-            echo "New record created successfully";
-        } else {
-            echo "Error: " . $statement . "<br>" . $this->connection->error;
+        $statement = $this->connection->prepare("INSERT INTO cars (brand, price, description, image) VALUES (?, ?, ?, ?)");
+        $result = $statement->execute([$car->getBrand(), $car->getPrice(), $car->getDescription(), $car->getImage()]);
+        $this->connection = null;
+        if ($result != TRUE) {
+            return ["error" => $statement . "<br>" . $this->connection->errorCode()];
         }
-
-        $this->connection->close();
+        return [];
     }
 
     private function setCar($row):Car
@@ -51,7 +64,7 @@ class CarRepository
         $car->setPrice($row['price']);
         $car->setBrand($row['brand']);
         $car->setDescription($row['description']);
-        $car->setDate($row['date']);
+        $car->setImage($row['image']);
         return $car;
     }
 }

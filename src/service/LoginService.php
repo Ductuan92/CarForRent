@@ -24,6 +24,7 @@ class LoginService
     {
         $user = $this->userRepository->searchByUserName($userRequest->getUserName());
         if($user && $this->verifyPassword($userRequest->getPassword(), $user->getPassword())){
+            echo $user->getUserName();
             return $user;
         }
         return null;

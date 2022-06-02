@@ -17,9 +17,9 @@
 
         <?php
 
-        if ($data!=null && array_key_exists('login', $data)) {
+        if ($data!=null && array_key_exists('error', $data)) {
             echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-        ' . $data["login"] . '
+        ' . $data["error"] . '
     </div>';
         }
 

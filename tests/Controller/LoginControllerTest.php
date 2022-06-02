@@ -3,6 +3,8 @@
 namespace Tests\Controller;
 
 use MyApp\Controller\LoginController;
+use MyApp\Http\Request;
+use MyApp\Http\Response;
 use MyApp\model\User;
 use MyApp\Repository\UserRepository;
 use MyApp\service\LoginService;
@@ -19,34 +21,37 @@ class LoginControllerTest extends TestCase
      */
     public function testIndex($param, $expected)
     {
-        $_SESSION["userID"] = $param['id'];
+        $_SESSION["userName"] = $param['userName'];
         $session = new Session();
         $user = new User();
         $userRepository = new UserRepository($user);
         $loginService = new LoginService($userRepository);
 
+        $request = new Request();
+        $response = new Response();
         $userLoginRequest = new UserLoginRequest();
         $userRequestValidation = new UserRequestValidation();
-        $loginController = new LoginController($loginService, $userLoginRequest, $userRequestValidation, $session);
+        $loginController = new LoginController($request, $response, $loginService, $userLoginRequest, $userRequestValidation, $session);
         $result = $loginController->index();
-
+        var_dump($result);
         $this->assertEquals($expected, $result);
     }
 
     public function indexDataProvider()
     {
+        $response = new Response();
         return [
-            'happy-case-1' => [
-                'param' => [
-                    'id' => '123'
-                ],
-                'expected' => true
-            ],
+//            'happy-case-1' => [
+//                'param' => [
+//                    'userName' => 'anh'
+//                ],
+//                'expected' => $response->view('index')
+//            ],
             'unhappy-case-1' => [
                 'param' => [
-                    'id' => ''
+                    'userName' => ''
                 ],
-                'expected' => false
+                'expected' => $response->view('login')
             ]
         ];
     }
@@ -61,21 +66,24 @@ class LoginControllerTest extends TestCase
     {
         $user = new User();
         $user->setId($param['id']);
+        $user->setUserName($param['userName']);
+        $user->setPassword($param['password']);
         $_POST['userName'] = $param['userName'];
         $_POST['password'] = $param['password'];
-//        $user->setUserName($param['userName']);
-//        $user->setPassword($param['password']);
+
         $loginServiceMock = $this->getMockBuilder(LoginService::class)->disableOriginalConstructor()->getMock();
         $loginServiceMock->expects($this->once())->method('Login')->willReturn($user);
 
+        $request = new Request();
+        $response = new Response();
         $userLoginRequest = new UserLoginRequest();
         $userRequestValidation = new UserRequestValidation();
         $session = new Session();
-        $loginController = new LoginController($loginServiceMock, $userLoginRequest, $userRequestValidation, $session);
+        $loginController = new LoginController($request, $response, $loginServiceMock, $userLoginRequest, $userRequestValidation, $session);
 
         $result = $loginController->login();
-
-        $this->assertTrue($result);
+        $expected = $response->view('index');
+        $this->assertEquals($expected, $result);
     }
 
     public function loginDataProvider()
@@ -109,12 +117,14 @@ class LoginControllerTest extends TestCase
         $loginService = new LoginService($userRepository);
         $session = new Session();
 
+        $request = new Request();
+        $response = new Response();
         $userLoginRequest = new UserLoginRequest();
         $userRequestValidation = new UserRequestValidation();
-        $loginController = new LoginController($loginService, $userLoginRequest, $userRequestValidation, $session);
+        $loginController = new LoginController($request, $response, $loginService, $userLoginRequest, $userRequestValidation, $session);
         $result = $loginController->login();
-
-        $this->assertFalse($result);
+        $expected = $response->view('index');
+        $this->assertEquals($expected, $result);
     }
 
     public function loginFalseDataProvider()
@@ -150,14 +160,16 @@ class LoginControllerTest extends TestCase
         $userRepository = new UserRepository($user);
         $loginService = new LoginService($userRepository);
         $session = new Session();
-        $session->setSessionId('3424');
+        $session->setSessionName('3424');
 
+        $request = new Request();
+        $response  = new Response();
         $userLoginRequest = new UserLoginRequest();
         $userRequestValidation = new UserRequestValidation();
-        $loginController = new LoginController($loginService, $userLoginRequest, $userRequestValidation, $session);
-        $loginController->logout();
-        $expected = array_key_exists('userID', $_SESSION);
+        $loginController = new LoginController($request, $response, $loginService, $userLoginRequest, $userRequestValidation, $session);
+        $result = $loginController->logout();
 
-        $this->assertFalse($expected);
+        $expected = $response->view('login');
+        $this->assertEquals($expected, $result);
     }
 }

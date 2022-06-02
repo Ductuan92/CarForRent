@@ -9,10 +9,11 @@ class SessionTest extends TestCase
 {
     public function testGetSessionID()
     {
-        $id = '123';
+        $name = '123';
         $session = new Session();
-        $session->setSessionId($id);
-        $result = $session->getSessionId();
-        $this->assertEquals($id, $result);
+        $session->setSessionName($name);
+        $result = $session->getSessionName();
+        $this->assertEquals($name, $result);
+        $this->assertEquals($name, $result);
     }
 }

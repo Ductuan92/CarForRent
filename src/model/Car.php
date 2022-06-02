@@ -6,9 +6,25 @@ class Car
 {
     private string $id;
     private string $brand;
-    private int $price;
+    private string $price;
     private string $description;
-    private int $date;
+    private string $image;
+
+    /**
+     * @return string
+     */
+    public function getImage(): string
+    {
+        return $this->image;
+    }
+
+    /**
+     * @param string $image
+     */
+    public function setImage(string $image): void
+    {
+        $this->image = $image;
+    }
 
     /**
      * @return string
@@ -43,17 +59,17 @@ class Car
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getPrice(): int
+    public function getPrice(): string
     {
         return $this->price;
     }
 
     /**
-     * @param int $price
+     * @param string $price
      */
-    public function setPrice(int $price): void
+    public function setPrice(string $price): void
     {
         $this->price = $price;
     }
@@ -72,22 +88,6 @@ class Car
     public function setDescription(string $description): void
     {
         $this->description = $description;
-    }
-
-    /**
-     * @return int
-     */
-    public function getDate(): int
-    {
-        return $this->date;
-    }
-
-    /**
-     * @param int $date
-     */
-    public function setDate(int $date): void
-    {
-        $this->date = $date;
     }
 
 }

@@ -15,8 +15,6 @@ class UserLoginControllerApi extends AbstractControllerApi
     private LoginService $loginService;
     private UserLoginRequest $userLoginRequest;
     private UserRequestValidation $userRequestValidation;
-    private Response $response;
-    private Request $request;
     private TokenService $token;
 
     /**
@@ -31,25 +29,15 @@ class UserLoginControllerApi extends AbstractControllerApi
         TokenService $token,
     )
     {
+        parent::__construct($response, $request);
         $this->loginService = $loginService;
         $this->userLoginRequest = $userLoginRequest;
         $this->userRequestValidation = $userRequestValidation;
         $this->token = $token;
-        $this->response = $response;
-        $this->request = $request;
     }
 
     /**
-     * @return void
-     */
-    public function index(): bool
-    {
-
-    }
-
-    /**
-     * @return bool
-     * @throws \ReflectionException
+     * @return Response
      */
     public function login(): Response
     {
@@ -63,13 +51,12 @@ class UserLoginControllerApi extends AbstractControllerApi
         if ($user == null) {
             return $this->response->error(["username or password is incorrect"]);
         }
-        $this->response->setHeaders(['']);
         $token = $this->token->generate($user);
         return $this->response->success([$token]);
     }
 
     /**
-     * @return string[]|void
+     * @return array
      */
     private function checkUserRequest(): array
     {
@@ -81,12 +68,12 @@ class UserLoginControllerApi extends AbstractControllerApi
     }
 
     /**
-     * @return void
+     * @return Response
      */
-    public function logout(): void
+    public function logout(): Response
     {
         unset($_SESSION['userID']);
-        View::render('login');
-        View::redirect('/user/login');
+        $this->response->setReDirect('/user/login');
+        return $this->response->view('/user/login');
     }
 }

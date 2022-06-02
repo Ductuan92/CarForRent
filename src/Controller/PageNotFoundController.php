@@ -3,15 +3,16 @@
 namespace MyApp\Controller;
 
 use MyApp\App\View;
+use MyApp\Http\Response;
 
-class PageNotFoundController
+class PageNotFoundController extends AbstractController
 {
     /**
-     * @return bool
+     * @return Response
      */
-    public function PageNotFound(): bool
+    public function pageNotFound(): Response
     {
-        View::render('PageNotFound');
-        return true;
+        var_dump($this->response->view('PageNotFound'));
+        return $this->response->view('PageNotFound');
     }
 }

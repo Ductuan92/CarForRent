@@ -6,30 +6,45 @@ use MyApp\Http\Request;
 use MyApp\Http\Response;
 use MyApp\model\Car;
 use MyApp\Repository\CarRepository;
+use MyApp\service\FileService;
+use MyApp\Transfer\CarTransfer;
+use MyApp\Validation\CarValidation;
 
-class CarControllerApi
+class CarControllerApi extends AbstractControllerApi
 {
-    private Response $response;
-    private Request $request;
+    CONST TARGET_DIR = "assets/img/";
+
     private CarRepository $carRepository;
-    /**
-     * @param Response $response
-     * @param Request $request
-     */public function __construct(
-            Response $response,
-            Request $request,
-            CarRepository $carRepository)
+    private CarTransfer $carTransfer;
+    private CarValidation $carValidation;
+    private FileService $fileService;
+
+     public function __construct(
+        Response $response,
+        Request $request,
+        CarRepository $carRepository,
+        CarTransfer $carTransfer,
+        CarValidation $carValidation,
+        FileService $fileService,
+     )
     {
-        $this->response = $response;
-        $this->request = $request;
+        parent::__construct($response, $request);
+        $this->carRepository = $carRepository;
+        $this->carTransfer = $carTransfer;
+        $this->carValidation = $carValidation;
+        $this->fileService = $fileService;
     }
 
 
-    public function listAllCars(): Response
+    public function index(): Response
     {
-        $car = new Car();
-        $this->response->setHeaders(['']);
-        return $this->response->success([$car]);
+        $cars = $this->carRepository->getAllCar();
+        $carTransfer = [];
+        foreach ($cars as $car){
+            $arrayCar = $this->carTransfer->toArray($car, self::TARGET_DIR);
+            array_push($carTransfer, ['car'=>$arrayCar]);
+        }
+        return $this->response->success($carTransfer);
     }
 
     public function getCar(): Response
@@ -37,5 +52,34 @@ class CarControllerApi
         $car = new Car();
         $this->response->setHeaders(['']);
         return $this->response->success([$car]);
+    }
+
+    public function addCar(): Response
+    {
+        $param = $this->request->getParams();
+        $carImg = $this->request->getFile()['image'];
+
+        $message = $this->carValidation->validate($param);
+        if(empty($message)){
+            $message = $this->upLoad($param, $carImg);
+        }
+
+        if(empty($message)){
+            return $this->response->success();
+        }
+        return $this->response->error($message);
+    }
+
+    private function upLoad($param, $carImg): array
+    {
+        $result = $this->fileService->handleUpload($carImg);
+        if(isset($result['error'])){
+            return $result;
+
+        }else{
+            $param = array_merge($param,["image"=>$result]);
+            $carTransfer = $this->carTransfer->fromArray($param);
+            return $this->carRepository->createCar($carTransfer);
+        }
     }
 }

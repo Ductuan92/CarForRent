@@ -7,8 +7,8 @@ use MyApp\Http\Response;
 
 abstract class AbstractControllerApi
 {
-    private Response $response;
-    private Request $request;
+    protected Response $response;
+    protected Request $request;
 
     /**
      * @param Response $response

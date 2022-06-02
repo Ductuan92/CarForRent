@@ -2,13 +2,15 @@
 
 namespace MyApp\Controller;
 
+use MyApp\Http\Request;
+use MyApp\Http\Response;
 use MyApp\request\UserLoginRequest;
 use MyApp\App\View;
 use MyApp\service\LoginService;
 use MyApp\Session\Session;
 use MyApp\Validation\UserRequestValidation;
 
-class LoginController
+class LoginController extends AbstractController
 {
     private LoginService $loginService;
     private UserLoginRequest $userLoginRequest;
@@ -18,73 +20,69 @@ class LoginController
     /**
      * @param LoginService $loginService
      */
-    public function __construct(
-        LoginService          $loginService,
-        UserLoginRequest      $userLoginRequest,
+    public function __construct(Request $request, Response $response,
+        LoginService $loginService,
+        UserLoginRequest $userLoginRequest,
         UserRequestValidation $userRequestValidation,
-        Session               $session
+        Session $session,
     )
     {
         $this->loginService = $loginService;
         $this->userLoginRequest = $userLoginRequest;
         $this->userRequestValidation = $userRequestValidation;
         $this->session = $session;
+        parent::__construct($request, $response);
     }
-
     /**
      * @return void
      */
-    public function index(): bool
+    public function index(): Response
     {
-        if (!empty($_SESSION["userID"])) {
-            View::render('index');
-            return true;
-        } else {
-            View::render('login');
-            return false;
+        if (!empty($_SESSION["userName"])) {
+            $this->response->setReDirect('/');
+            return $this->response->view('index');
         }
+        return $this->response->view('login');
     }
 
     /**
      * @return bool
      * @throws \ReflectionException
      */
-    public function login(): bool
+    public function login(): Response
     {
-        $this->checkUserRequest();
+        $message = $this->checkUserRequest();
+        if($message != []){
+            $this->response->setOption($message);
+            return $this->response->view('login');
+        }
         $user = $this->loginService->Login($this->userLoginRequest);
         if ($user == null) {
-            View::render('login', [
-                'login' => 'user or password is incorrect'
-            ]);
-            return false;
+            $this->response->setOption(['error'=>'user or password is incorrect']);
+            return $this->response->view('login');
         }
-        $this->session->setSessionId($user->getId());
-        View::redirect('/');
-        return true;
+        $this->session->setSessionName($user->getUserName());
+        $this->response->setReDirect('/');
+        return $this->response->view('index');
     }
 
     /**
-     * @return false|void
+     * @return string[]
      */
-    private function checkUserRequest()
+    private function checkUserRequest(): array
     {
         $this->userLoginRequest->setUserName($_POST['userName']);
         $this->userLoginRequest->setPassword($_POST['password']);
         $message = $this->userRequestValidation->validateEmptyUserNamePassword($this->userLoginRequest);
-        if ($message != []) {
-            View::render('login', $message);
-            return false;
-        }
+        return $message;
     }
 
     /**
      * @return void
      */
-    public function logout(): void
+    public function logout(): Response
     {
-        unset($_SESSION['userID']);
-        View::render('login');
-        View::redirect('/user/login');
+        unset($_SESSION['userName']);
+        return $this->response->view('login');
     }
 }

@@ -23,14 +23,8 @@ class Request
      */
     public static function requestUri()
     {
-        $path = $_SERVER['REQUEST_URI'];
-        $position = strpos($path, '?');
-
-        if ($position === false) {
-            return $path;
-        }
-
-        return substr($path, 0, $position);
+        $path = strtok($_SERVER['REQUEST_URI'], '?');
+        return $path;
     }
     public function getRequestBody()
     {
@@ -55,5 +49,15 @@ class Request
         $pathComponents = parse_url($path);
         parse_str($pathComponents['query'], $params);
         return $params;
+    }
+
+    public function getFormParams(): array
+    {
+        return $_REQUEST;
+    }
+
+    public function getFile()
+    {
+        return $_FILES;
     }
 }

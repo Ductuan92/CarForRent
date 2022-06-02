@@ -2,16 +2,61 @@
 
 namespace MyApp\Http;
 
+use MyApp\App\Route;
+
 class Response
 {
     const HTTP_STATUS_OK = 200;
     const HTTP_STATUS_BAD_REQUEST = 400;
     const HTTP_STATUS_NOT_FOUND = 404;
     const HTTP_STATUS_SERVER_ERROR = 500;
-    private $headers;
-    private $data;
-    private $statusCode;
-    private $template;
+    private array $headers = [];
+    private ?string $data = null;
+    private  int $statusCode;
+    private ?string $template = null;
+    private string $reDirect = '';
+
+    /**
+     * @return string
+     */
+    public function getReDirect(): string
+    {
+        return $this->reDirect;
+    }
+
+    /**
+     * @param string $reDirect
+     */
+    public function setReDirect(string $reDirect): void
+    {
+        $this->reDirect = $reDirect;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOption(): array
+    {
+        return $this->option;
+    }
+
+    /**
+     * @param array $option
+     */
+    public function setOption(array $option): void
+    {
+        $this->option = $option;
+    }
+    private array $option = [];
+
+    public function view(string $template, array $options = [], int $statusCode = Response::HTTP_STATUS_OK): Response
+    {
+        $this->statusCode = $statusCode;
+        $this->template = $template;
+        $this->setOption($options);
+
+        return $this;
+    }
 
     public function success(array $data = [], $statusCode = Response::HTTP_STATUS_OK): Response
     {

@@ -59,16 +59,8 @@ class RequestTest extends TestCase
     public function requestUriDataProvider(){
         return [
             'happy-case-1'=>[
-                'param'=>[
-                    '/login',
-                    '/index',
-                    '/user/login'
-                ],
-                'expected'=>[
-                    '/login',
-                    '/index',
-                    '/user/login'
-                ]
+                'param'=> '/login',
+                'expected'=> '/login'
             ]
         ];
     }

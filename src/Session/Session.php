@@ -8,17 +8,17 @@ class Session
     /**
      * @return string
      */
-    public function getSessionId(): string
+    public function getSessionName(): string
     {
-        return $_SESSION['userID'];
+        return $_SESSION['userName'];
     }
 
     /**
      * @param string $sessionId
      */
-    public function setSessionId(string $sessionId): void
+    public function setSessionName(string $sessionName): void
     {
-        $_SESSION['userID'] = $sessionId;
+        $_SESSION['userName'] = $sessionName;
     }
 
 }

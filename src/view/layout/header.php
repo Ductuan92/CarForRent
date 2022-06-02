@@ -7,4 +7,17 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <link href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <?php
+    if (isset($_SESSION['userName'])) { ?>
+        <li class="nav-item" style="margin-left: 770px">
+            <?php echo "Welcome " . $_SESSION['userName']; ?>
+        </li>
+        <li class="nav-item">
+            <form method="post" action="/logout">
+                <button type="submit" class="btn btn-outline-dark" style="margin-left: 20px">log out</button>
+            </form>
+        </li>
 
+    <?php } ?>

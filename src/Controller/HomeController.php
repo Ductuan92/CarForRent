@@ -3,15 +3,17 @@
 namespace MyApp\Controller;
 
 use MyApp\App\View;
+use MyApp\Http\Request;
+use MyApp\Http\Response;
 
-class HomeController
+class HomeController extends AbstractController
 {
+
     /**
-     * @return void
+     * @return Response
      */
-    public function index(): bool
+    public function index(): Response
     {
-        View::render('index');
-        return true;
+        return $this->response->view('index');
     }
 }

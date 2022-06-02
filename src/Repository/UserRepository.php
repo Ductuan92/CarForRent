@@ -12,13 +12,15 @@ class UserRepository
      * @var PDO
      */
     private PDO $connection;
+    private User $user;
 
     /**
      * @param $connection
      */
-    public function __construct()
+    public function __construct(User $user)
     {
         $this->connection = Database::databaseConnection();
+        $this->user = $user;
     }
 
     /**
@@ -34,7 +36,8 @@ class UserRepository
         $statement->closeCursor();
 
         if($row){
-            return $this->setUser($row);
+            $this->setUser($row);
+            return $this->user;
         }
         return null;
     }
@@ -52,23 +55,23 @@ class UserRepository
         $statement->closeCursor();
 
         if($row){
-            return $this->setUser($row);
+            $this->setUser($row);
+            return $this->user;
         }
         return null;
     }
 
     /**
      * @param $row
-     * @return User
+     * @return void
      */
-    private function setUser($row):User
+    private function setUser($row):void
     {
-        $user = new User();
-        $user->setId($row['id']);
-        $user->setUserName($row['username']);
-        $user->setPassword($row['password']);
-        $user->setEmail($row['email']);
-        $user->setRole($row['role']);
-        return $user;
+        $this->user = new User();
+        $this->user->setId($row['id']);
+        $this->user->setUserName($row['username']);
+        $this->user->setPassword($row['password']);
+        $this->user->setEmail($row['email']);
+        $this->user->setRole($row['role']);
     }
 }

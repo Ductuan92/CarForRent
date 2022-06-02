@@ -37,7 +37,7 @@ class UserRequestValidationTest extends TestCase
                     'password'=>'sa'
                 ],
                 'expected'=>[
-                    'login'=>'user name and password must not empty'
+                    'error' => 'user name and password must not empty'
                 ]
             ]
         ];

@@ -5,6 +5,7 @@ namespace MyApp\App;
 use MyApp\Controller\Api\AdminLoginControllerApi;
 use MyApp\Controller\Api\CarControllerApi;
 use MyApp\Controller\Api\UserLoginControllerApi;
+use MyApp\Controller\CarController;
 use MyApp\Controller\HomeController;
 use MyApp\Controller\LoginController;
 use MyApp\Controller\PageNotFoundController;
@@ -17,7 +18,7 @@ class Route
     /**
      * @var string
      */
-    protected string $role;
+    protected string $role = '';
     /**
      * @var string
      */
@@ -31,12 +32,12 @@ class Route
     /**
      * @var string
      */
-    protected string $controllerClassName;
+    protected string $controllerClassName = PageNotFoundController::class;
 
     /**
      * @var string
      */
-    protected string $actionName;
+    protected string $actionName = 'pageNotFound';
 
     /**
      * @param string $method
@@ -56,29 +57,29 @@ class Route
     }
 
     /**
-     * @return bool
+     * @return $this|null
      */
     public function getRoute(): Route|null
     {
         $routes = array(
-            array('GET', '/', HomeController::class, 'index', ''),
-            array('GET', '/index', HomeController::class, 'index',''),
+            array('GET', '/', CarController::class, 'index', ''),
+            array('GET', '/index', CarController::class, 'index',''),
             array('GET', '/user/login', LoginController::class, 'index',''),
             array('POST', '/user/login', LoginController::class, 'login',''),
             array('POST', '/logout', LoginController::class, 'logout',''),
             array('GET', '/logout', LoginController::class, 'login',''),
-            array('GET', '/admin/login', AdminLoginController::class, 'index',''),
-            array('Post', '/admin/login', AdminLoginController::class, 'login',''),
+            array('POST', '/cars', CarController::class, 'addCar',User::ROLE_ADMIN),
+            array('GET', '/cars', CarController::class, 'addCarPage',''),
 
-            array('GET', '/api/admin/login', AdminLoginControllerApi::class, 'index',''),
-            array('GET', '/api/cars', CarControllerApi::class, 'listAllCars',''),
+            array('GET', '/api/cars', CarControllerApi::class, 'index',''),
             array('POST', '/api/user/login', UserLoginControllerApi::class, 'login',''),
-            array('GET', '/api/user/cars', CarControllerApi::class, 'getCar',User::ROLE_ADMIN)
+            array('POST', '/api/cars', CarControllerApi::class, 'addCar',User::ROLE_ADMIN)
         );
 
         foreach ($routes as $route) {
-            if ($route[0] == Request::requestMethod() && $route[1] == Request::requestUri()) {
+            if ($route[0] === Request::requestMethod() && $route[1] === Request::requestUri()) {
                 list($method, $uri, $controller, $action, $role) = $route;
+                //echo $method. $uri. $controller. $action. $role;
                 $this->setRoute($method, $uri, $controller, $action, $role);
                 return $this;
             }
@@ -107,9 +108,6 @@ class Route
      */
     public function getControllerClassName(): string
     {
-        if (empty($this->controllerClassName)) {
-            $this->controllerClassName = PageNotFoundController::class;
-        }
         return $this->controllerClassName;
     }
 
@@ -118,9 +116,6 @@ class Route
      */
     public function getActionName(): string
     {
-        if (empty($this->actionName)) {
-            $this->actionName = 'PageNotFound';
-        }
         return $this->actionName;
     }
 
