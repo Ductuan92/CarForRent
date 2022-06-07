@@ -22,10 +22,14 @@ class Application
     {
         $this->container = new Container();
         list($controllerClassName, $actionName, $message) = $this->getController();
-
-        $response = $this->callController($controllerClassName, $actionName);
+        if(empty($message)){
+            $response = $this->callController($controllerClassName, $actionName);
+        } else{
+            $response = $this->container->make(Response::class);
+            $response->error($message);
+        }
         $view = $this->container->make(View::class);
-        if($response) {
+        if ($response) {
             $view->handle($response, $message ?? []);
             return true;
         }
@@ -42,7 +46,7 @@ class Application
         $actionName = 'pageNotFound';
 
         $route = $this->getRoute();
-        if($route != null) {
+        if ($route != null) {
             $message = $this->checkAcl($route);
             $actionName = $route->getActionName();
             $controllerClassName = $route->getControllerClassName();

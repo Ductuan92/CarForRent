@@ -19,8 +19,8 @@ class AclMiddleware
      * @param UserRepository $userRepository
      */
     public function __construct(
-        Request $request,
-        TokenService $tokenService,
+        Request        $request,
+        TokenService   $tokenService,
         UserRepository $userRepository,
     )
     {
@@ -36,11 +36,11 @@ class AclMiddleware
     public function verify(Route $route): array
     {
         $role = $route->getRole();
-        if(empty($role)){
+        if(!$role){
             return [];
         }
         $uri = substr(Request::requestUri(), 1, 3);
-        if($uri == 'api'){
+        if ($uri == 'api') {
             return $this->checkToken($role);
         }
         return $this->checkSession($role);
@@ -56,10 +56,13 @@ class AclMiddleware
         $tokenPayload = $this->tokenService->getTokenPayload($authorizationToken);
         $userId = $tokenPayload['sub'];
         $user = $this->userRepository->searchById($userId);
+        if ($user == null) {
+            return ['error'=>'Invalid user'];
+        }
         if ($user->getRole() === $role) {
             return [];
         }
-        return ['User are not permitted'];
+        return ['error'=>'User are not permitted'];
     }
 
     /**
@@ -69,12 +72,13 @@ class AclMiddleware
     private function checkSession($role): array
     {
         $session = $_SESSION['userName'] ?? null;
-        if($session != null){
-            $user = $this->userRepository->searchByUserName($_SESSION['userName']);
-            if($user->getRole() == $role){
-                return [];
-            }
+        if ($session == null) {
+            return ['error'=>'you must login first'];
         }
-        return ['User are not permitted'];
+        $user = $this->userRepository->searchByUserName($_SESSION['userName']);
+        if ($user->getRole() == $role) {
+            return [];
+        }
+        return ['error'=>'User are not permitted'];
     }
 }

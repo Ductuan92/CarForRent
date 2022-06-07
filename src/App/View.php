@@ -35,10 +35,10 @@ class View
     {
         http_response_code($response->getStatusCode());
         if (!empty($response->getTemplate())) {
-            if(!empty($response->getReDirect())){
+            if (!empty($response->getReDirect())) {
                 $this->redirect($response->getReDirect());
             }
-            $this->render($response->getTemplate(),$response->getOption());
+            $this->render($response->getTemplate(), $response->getOption());
             return true;
         }
         return $this->handleApi($response);
@@ -50,11 +50,11 @@ class View
      */
     public function handleApi(Response $response): bool
     {
-        foreach ($response->getHeaders() as $key => $value){
-            $header = $key. ': ' . $value;
+        foreach ($response->getHeaders() as $key => $value) {
+            $header = $key . ': ' . $value;
             header($header);
         }
-        if(!empty($response->getData())){
+        if (!empty($response->getData())) {
             echo $response->getData();
             return true;
         }

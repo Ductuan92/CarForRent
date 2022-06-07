@@ -21,12 +21,12 @@ class UserLoginControllerApi extends AbstractControllerApi
      * @param LoginService $loginService
      */
     public function __construct(
-        LoginService $loginService,
-        UserLoginRequest $userLoginRequest,
+        LoginService          $loginService,
+        UserLoginRequest      $userLoginRequest,
         UserRequestValidation $userRequestValidation,
-        Response $response,
-        Request $request,
-        TokenService $token,
+        Response              $response,
+        Request               $request,
+        TokenService          $token,
     )
 
     {
@@ -46,7 +46,7 @@ class UserLoginControllerApi extends AbstractControllerApi
         $this->userLoginRequest->setUserName($params['username']);
         $this->userLoginRequest->setPassword($params['password']);
 
-        if(!empty($this->checkUserRequest())){
+        if (!empty($this->checkUserRequest())) {
             return $this->response->error([$this->checkUserRequest()]);
         }
         $user = $this->loginService->Login($this->userLoginRequest);
@@ -54,7 +54,7 @@ class UserLoginControllerApi extends AbstractControllerApi
             return $this->response->error(["username or password is incorrect"]);
         }
         $token = $this->token->generate($user);
-        return $this->response->success(['token'=>$token]);
+        return $this->response->success(['token' => $token]);
     }
 
     /**

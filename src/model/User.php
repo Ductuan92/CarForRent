@@ -4,7 +4,7 @@ namespace MyApp\model;
 
 class User
 {
-    public const ROLE_GUEST = 'quest';
+    public const ROLE_GUEST = 'guest';
     public const ROLE_MEMBER = 'member';
     public const ROLE_ADMIN = 'admin';
     /**

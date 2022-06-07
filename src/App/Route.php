@@ -15,20 +15,20 @@ use MyApp\model\User;
 
 class Route
 {
-    CONST ROUTES = array(
-            array('GET', '/', CarController::class, 'index', ''),
-            array('GET', '/index', CarController::class, 'index',''),
-            array('GET', '/user/login', LoginController::class, 'index',''),
-            array('POST', '/user/login', LoginController::class, 'login',''),
-            array('POST', '/logout', LoginController::class, 'logout',''),
-            array('GET', '/logout', LoginController::class, 'login',''),
-            array('POST', '/cars', CarController::class, 'addCar',User::ROLE_ADMIN),
-            array('GET', '/cars', CarController::class, 'addCarPage',''),
+    const ROUTES = array(
+        array('GET', '/', CarController::class, 'index', ''),
+        array('GET', '/index', CarController::class, 'index', ''),
+        array('GET', '/user/login', LoginController::class, 'index', ''),
+        array('POST', '/user/login', LoginController::class, 'login', ''),
+        array('POST', '/logout', LoginController::class, 'logout', ''),
+        array('GET', '/logout', LoginController::class, 'login', ''),
+        array('POST', '/cars', CarController::class, 'addCar', User::ROLE_ADMIN),
+        array('GET', '/cars', CarController::class, 'addCarPage', ''),
 
-            array('GET', '/api/cars', CarControllerApi::class, 'index',''),
-            array('POST', '/api/user/login', UserLoginControllerApi::class, 'login',''),
-            array('POST', '/api/cars', CarControllerApi::class, 'addCar',User::ROLE_ADMIN)
-        );
+        array('GET', '/api/cars', CarControllerApi::class, 'index', ''),
+        array('POST', '/api/user/login', UserLoginControllerApi::class, 'login', ''),
+        array('POST', '/api/cars', CarControllerApi::class, 'addCar', User::ROLE_ADMIN)
+    );
     /**
      * @var string
      */

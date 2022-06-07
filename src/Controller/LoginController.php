@@ -20,11 +20,11 @@ class LoginController extends AbstractController
     /**
      * @param LoginService $loginService
      */
-    public function __construct(Request $request, Response $response,
-        LoginService $loginService,
-        UserLoginRequest $userLoginRequest,
-        UserRequestValidation $userRequestValidation,
-        Session $session,
+    public function __construct(Request               $request, Response $response,
+                                LoginService          $loginService,
+                                UserLoginRequest      $userLoginRequest,
+                                UserRequestValidation $userRequestValidation,
+                                Session               $session,
     )
     {
         $this->loginService = $loginService;
@@ -33,6 +33,7 @@ class LoginController extends AbstractController
         $this->session = $session;
         parent::__construct($request, $response);
     }
+
     /**
      * @return void
      */
@@ -52,13 +53,13 @@ class LoginController extends AbstractController
     public function login(): Response
     {
         $message = $this->checkUserRequest();
-        if($message != []){
+        if ($message != []) {
             $this->response->setOption($message);
             return $this->response->view('login');
         }
         $user = $this->loginService->Login($this->userLoginRequest);
         if ($user == null) {
-            $this->response->setOption(['error'=>'user or password is incorrect']);
+            $this->response->setOption(['error' => 'user or password is incorrect']);
             return $this->response->view('login');
         }
         $this->session->setSessionName($user->getUserName());

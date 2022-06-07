@@ -12,21 +12,21 @@ use MyApp\Validation\CarValidation;
 
 class CarControllerApi extends AbstractControllerApi
 {
-    CONST TARGET_DIR = "assets/img/";
+    const TARGET_DIR = "assets/img/";
 
     private CarRepository $carRepository;
     private CarTransfer $carTransfer;
     private CarValidation $carValidation;
     private FileService $fileService;
 
-     public function __construct(
-        Response $response,
-        Request $request,
+    public function __construct(
+        Response      $response,
+        Request       $request,
         CarRepository $carRepository,
-        CarTransfer $carTransfer,
+        CarTransfer   $carTransfer,
         CarValidation $carValidation,
-        FileService $fileService,
-     )
+        FileService   $fileService,
+    )
     {
         parent::__construct($response, $request);
         $this->carRepository = $carRepository;
@@ -40,9 +40,9 @@ class CarControllerApi extends AbstractControllerApi
     {
         $cars = $this->carRepository->getAllCar();
         $carTransfer = [];
-        foreach ($cars as $car){
+        foreach ($cars as $car) {
             $arrayCar = $this->carTransfer->toArray($car, self::TARGET_DIR);
-            array_push($carTransfer, ['car'=>$arrayCar]);
+            array_push($carTransfer, ['car' => $arrayCar]);
         }
         return $this->response->success($carTransfer);
     }
@@ -59,11 +59,11 @@ class CarControllerApi extends AbstractControllerApi
         $param = $this->request->getParams();
         $carImg = $this->request->getFile()['image'];
         $message = $this->carValidation->validate($param);
-        if(empty($message)){
+        if (empty($message)) {
             $message = $this->upLoad($param, $carImg);
         }
 
-        if(empty($message)){
+        if (empty($message)) {
             return $this->response->success();
         }
         return $this->response->error($message);
@@ -72,11 +72,11 @@ class CarControllerApi extends AbstractControllerApi
     private function upLoad($param, $carImg): array
     {
         $result = $this->fileService->uploadToS3($carImg);
-        if(isset($result['error'])){
+        if (isset($result['error'])) {
             return $result;
 
-        }else{
-            $param = array_merge($param,["image"=>$result]);
+        } else {
+            $param = array_merge($param, ["image" => $result]);
             $carTransfer = $this->carTransfer->fromArray($param);
             return $this->carRepository->createCar($carTransfer);
         }

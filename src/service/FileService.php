@@ -11,12 +11,17 @@ use phpDocumentor\Reflection\Type;
 class FileService
 {
     private static $loadEnv;
+    private static string $path = "../public/assets/img/";
 
-    public function uploadToS3($file): array|string
+    public function __construct()
     {
         self::$loadEnv = Dotenv::createImmutable(dirname(__DIR__));
         self::$loadEnv->load();
-        $path = "../public/assets/img/";
+
+    }
+
+    public function uploadToS3($file): array|string
+    {
         $bucketName = $_ENV['S3_BUCKET_NAME'];
         $filename = md5(date('Y-m-d H:i:s:u')) . $file["name"];
         $s3Client = $this->connectS3();
@@ -24,17 +29,7 @@ class FileService
         if($message){
             return $message;
         }
-        $upLoadResult = $this->upload($s3Client, $file, $filename, $bucketName, $path);
-        if(gettype($upLoadResult) == 'string'){
-            return $upLoadResult;
-        }
-        $result = array_merge($message, $upLoadResult);
-        if(!array_key_exists('error',$result))
-        {
-            return $result;
-        }
-        $message = array_merge($result);
-        return $message;
+        return $this->upload($s3Client, $file, $filename, $bucketName);
     }
 
     /**
@@ -95,12 +90,12 @@ class FileService
     }
     private function verifyFormat($file, $filename,): array
     {
-        $allowed = array(
+        $allowed = [
             "jpg" => "image/jpg",
             "jpeg" => "image/jpeg",
             "gif" => "image/gif",
             "png" => "image/png"
-        );
+        ];
         $filetype = $file["type"];
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
         if (!array_key_exists($ext, $allowed) || !in_array($filetype, $allowed)) {
@@ -109,18 +104,18 @@ class FileService
         return [];
     }
 
-    private function upload($s3Client, $file, $filename, $bucketName, $path)
+    private function upload($s3Client, $file, $filename, $bucketName)
     {
-        if (move_uploaded_file($file["tmp_name"], $path . $filename)) {
-            $file_Path = $path . $filename;
+        if (move_uploaded_file($file["tmp_name"], self::$path . $filename)) {
+            $file_Path = self::$path . $filename;
             $key = basename($file_Path);
-            return $this->uploadS3($s3Client, $bucketName, $filename, $file_Path, $key, $path);
+            return $this->uploadS3($s3Client, $bucketName, $filename, $file_Path, $key);
         } else {
             return ['error' => 'There was an error!!'];
         }
     }
 
-    private function uploadS3($s3Client, $bucketName, $filename, $file_Path, $key, $path): array|string
+    private function uploadS3($s3Client, $bucketName, $filename, $file_Path, $key): array|string
     {
         try {
             $result = $s3Client->putObject([
@@ -128,10 +123,10 @@ class FileService
                 'Key' => $key,
                 'SourceFile' => $file_Path,
             ]);
-            unlink($path . $filename);
+            unlink(self::$path . $filename);
             return $result->get('ObjectURL');
         } catch (S3Exception $e) {
-            return ['error' => 'Error when upload image to S3!!!'];
+            return ['error' => 'Error when upload image to S3!!!' . $e->getMessage()];
         }
     }
 }
