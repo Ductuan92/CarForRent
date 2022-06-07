@@ -33,23 +33,21 @@ class CarRepository
         return $cars;
     }
 
-    public function searchById($id): Car|null
-    {
-        $statement = $this->connection->prepare("SELECT * FROM cars WHERE id = ? ");
-        $statement->execute([$id]);
-        $row = $statement->fetch();
-        $statement->closeCursor();
-
-        if($row){
-            return $this->setCar($row);
-        }
-        return null;
-    }
-
     public function createCar(CarTransfer $car): array
     {
         $statement = $this->connection->prepare("INSERT INTO cars (brand, price, description, image) VALUES (?, ?, ?, ?)");
         $result = $statement->execute([$car->getBrand(), $car->getPrice(), $car->getDescription(), $car->getImage()]);
+        $this->connection = null;
+        if ($result != TRUE) {
+            return ["error" => $statement . "<br>" . $this->connection->errorCode()];
+        }
+        return [];
+    }
+
+    public function deleteCar(CarTransfer $car)
+    {
+        $statement = $this->connection->prepare("DELETE FROM cars WHERE brand = ? and description = ?");
+        $result = $statement->execute([$car->getBrand(), $car->getDescription()]);
         $this->connection = null;
         if ($result != TRUE) {
             return ["error" => $statement . "<br>" . $this->connection->errorCode()];

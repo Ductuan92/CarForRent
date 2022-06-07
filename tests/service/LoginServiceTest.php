@@ -15,18 +15,10 @@ class LoginServiceTest extends TestCase
      * @dataProvider loginDataProvider
      * @param $param
      * @return void
-     * @throws \ReflectionException
      */
     public function testLogin($param)
     {
-        $userRequest = new UserLoginRequest();
-        $userRequest->setUserName($param['userName']);
-        $userRequest->setPassword($param['password']);
-        $user = new User();
-        $userRepository = new UserRepository($user);
-
-        $loginService = new LoginService($userRepository);
-        $result = $loginService->Login($userRequest);
+        $result = $this->createLogin($param);
         $this->assertNotNull($result);
     }
 
@@ -46,18 +38,10 @@ class LoginServiceTest extends TestCase
      * @dataProvider loginFalseDataProvider
      * @param $param
      * @return void
-     * @throws \ReflectionException
      */
     public function testLoginFalse($param)
     {
-        $userRequest = new UserLoginRequest();
-        $userRequest->setUserName($param['userName']);
-        $userRequest->setPassword($param['password']);
-        $user = new User();
-        $userRepository = new UserRepository($user);
-
-        $loginService = new LoginService($userRepository);
-        $result = $loginService->Login($userRequest);
+        $result = $this->createLogin($param);
         $this->assertNull($result);
     }
 
@@ -71,5 +55,21 @@ class LoginServiceTest extends TestCase
                 ]
             ],
         ];
+    }
+
+    /**
+     * @param $param
+     * @return User|null
+     */
+    private function createLogin($param): ?User
+    {
+        $user = new User();
+        $userRequest = new UserLoginRequest();
+        $userRepository = new UserRepository($user);
+        $loginService = new LoginService($userRepository);
+
+        $userRequest->setUserName($param['userName']);
+        $userRequest->setPassword($param['password']);
+        return $loginService->Login($userRequest);
     }
 }

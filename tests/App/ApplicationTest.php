@@ -18,7 +18,6 @@ class ApplicationTest extends TestCase
     {
         $_SERVER['REQUEST_METHOD'] = $param['method'];
         $_SERVER['REQUEST_URI'] = $param['uri'];
-        $userRequest = new UserLoginRequest();
         $_POST['userName'] = $param['userName'];
         $_POST['password'] = $param['password'];
         $app = new Application();

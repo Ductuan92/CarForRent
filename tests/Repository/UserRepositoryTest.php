@@ -9,13 +9,34 @@ use MyApp\Database\Database;
 
 class UserRepositoryTest extends TestCase
 {
-    public function testSearchByUserName()
+    /**
+     * @dataProvider searchByUserNameDataProvider
+     * @return void
+     */
+    public function testSearchByUserName($param, $expected)
     {
-        Database::databaseConnection();
         $user = new User();
         $userRepository = new UserRepository($user);
-        $result = $userRepository->searchByUserName('anh')->getUserName();
-        $this->assertEquals('anh', $result);
+        $result = $userRepository->searchByUserName($param)->getUserName();
+        $this->assertEquals($expected, $result);
+    }
+
+    public function searchByUserNameDataProvider()
+    {
+        return [
+          'happy-case-1'=>[
+              'param'=>'anh',
+              'expected'=>'anh'
+          ]
+        ];
+    }
+
+    public function testSearchByUserNameNull()
+    {
+        $user = new User();
+        $userRepository = new UserRepository($user);
+        $result = $userRepository->searchByUserName('nhoc');
+        $this->assertNull($result);
     }
 
     /**

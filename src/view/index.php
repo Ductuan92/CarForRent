@@ -43,7 +43,7 @@
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-sm btn-outline-secondary">Add
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary">Buy now
+                                                <button type="button" class="btn btn-sm btn-outline-secondary">Rent now
                                                 </button>
                                             </div>
                                             <small class="text-muted"><?php echo $car->getPrice() ?></small>

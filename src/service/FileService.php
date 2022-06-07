@@ -5,16 +5,43 @@ namespace MyApp\service;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use Dotenv\Dotenv;
+use MyApp\Http\Request;
+use phpDocumentor\Reflection\Type;
 
 class FileService
 {
     private static $loadEnv;
 
-    public function UploadToS3($file)
+    public function uploadToS3($file): array|string
     {
-        self::$loadEnv = Dotenv::createImmutable( '../src');
+        self::$loadEnv = Dotenv::createImmutable(dirname(__DIR__));
         self::$loadEnv->load();
+        $path = "../public/assets/img/";
         $bucketName = $_ENV['S3_BUCKET_NAME'];
+        $filename = md5(date('Y-m-d H:i:s:u')) . $file["name"];
+        $s3Client = $this->connectS3();
+        $message = $this->verifyImage($file, $filename);
+        if($message){
+            return $message;
+        }
+        $upLoadResult = $this->upload($s3Client, $file, $filename, $bucketName, $path);
+        if(gettype($upLoadResult) == 'string'){
+            return $upLoadResult;
+        }
+        $result = array_merge($message, $upLoadResult);
+        if(!array_key_exists('error',$result))
+        {
+            return $result;
+        }
+        $message = array_merge($result);
+        return $message;
+    }
+
+    /**
+     * @return S3Client
+     */
+    private function connectS3(): S3Client
+    {
         $bucketRegion = $_ENV['S3_BUCKET_REGION'];
         $accessKey = $_ENV['S3_ACCESS_KEY_ID'];
         $secretKey = $_ENV['S3_SECRET_ACCESS_KEY'];
@@ -23,50 +50,88 @@ class FileService
             'region' => $bucketRegion,
             'credentials' => ['key' => $accessKey, 'secret' => $secretKey]
         ]);
-        if ($_SERVER["REQUEST_METHOD"] == "GET") {
-            return ['error' => 'Invalid request method'];
-        }
+
+        return $s3Client;
+    }
+
+    /**
+     * @param $file
+     * @return string|string[]
+     */
+    private function verifyImage($file, $filename): string|array
+    {
+        $result = $this->verifyEmptyImage($file);
+        $result = array_merge($result, $this->verifyMethod());
+        $result = array_merge($result, $this->verifyFormat($file, $filename));
+        return array_merge($result, $this->verifySize($file));
+    }
+
+    private function verifyEmptyImage($file): array
+    {
         if (!isset($file) || $file["error"] != 0) {
             return ['error' => 'File upload does not exist'];
         }
+        return [];
+    }
+
+    private function verifyMethod(): array
+    {
+        if (Request::requestMethod() != "POST") {
+            return ['error' => 'Invalid request method'];
+        }
+        return [];
+    }
+
+    private function verifySize($file): array
+    {
+
+        $filesize = $file["size"];
+        $maxsize = 10 * 2024 * 2024;
+
+        if ($filesize > $maxsize) {
+            return ['error' => 'File size is larger than the allowed limit'];
+        }
+        return [];
+    }
+    private function verifyFormat($file, $filename,): array
+    {
         $allowed = array(
             "jpg" => "image/jpg",
             "jpeg" => "image/jpeg",
             "gif" => "image/gif",
             "png" => "image/png"
         );
-        $path = "../public/assets/img/";
-        $filename = md5(date('Y-m-d H:i:s:u')) . $file["name"];
         $filetype = $file["type"];
-        $filesize = $file["size"];
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
-        if (!array_key_exists($ext, $allowed)) {
+        if (!array_key_exists($ext, $allowed) || !in_array($filetype, $allowed)) {
             return ['error' => 'Please select a valid file format'];
         }
-        $maxsize = 10 * 2024 * 2024;
+        return [];
+    }
 
-        if ($filesize > $maxsize) {
-            return ['error' => 'File size is larger than the allowed limit'];
-        }
-        if (!in_array($filetype, $allowed)) {
-            return ['error' => 'Please select a valid file format'];
-        }
+    private function upload($s3Client, $file, $filename, $bucketName, $path)
+    {
         if (move_uploaded_file($file["tmp_name"], $path . $filename)) {
             $file_Path = $path . $filename;
             $key = basename($file_Path);
-            try {
-                $result = $s3Client->putObject([
-                    'Bucket' => $bucketName,
-                    'Key' => $key,
-                    'SourceFile' => $file_Path,
-                ]);
-                unlink($path . $filename);
-                return $result->get('ObjectURL');
-            } catch (S3Exception $e) {
-                return ['error' => 'Error when upload image to S3!!!'];
-            }
+            return $this->uploadS3($s3Client, $bucketName, $filename, $file_Path, $key, $path);
         } else {
             return ['error' => 'There was an error!!'];
+        }
+    }
+
+    private function uploadS3($s3Client, $bucketName, $filename, $file_Path, $key, $path): array|string
+    {
+        try {
+            $result = $s3Client->putObject([
+                'Bucket' => $bucketName,
+                'Key' => $key,
+                'SourceFile' => $file_Path,
+            ]);
+            unlink($path . $filename);
+            return $result->get('ObjectURL');
+        } catch (S3Exception $e) {
+            return ['error' => 'Error when upload image to S3!!!'];
         }
     }
 }

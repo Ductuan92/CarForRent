@@ -37,14 +37,13 @@ class TokenService
     {
         $bearerToken = explode('Bearer ', $authorizationToken);
         if (count($bearerToken) !== 2 || empty($bearerToken[1])) {
-            throw new InvalidTokenException();
+            throw new InvalidTokenException('invalid token');
         }
         $token = $bearerToken[1];
         $payload = $this->checkToken($token);
         if ($payload) {
             return $payload;
         }
-
-        throw new AuthenticationException();
+        throw new AuthenticationException('unauthorized');
     }
 }

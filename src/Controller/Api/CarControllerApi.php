@@ -58,7 +58,6 @@ class CarControllerApi extends AbstractControllerApi
     {
         $param = $this->request->getParams();
         $carImg = $this->request->getFile()['image'];
-
         $message = $this->carValidation->validate($param);
         if(empty($message)){
             $message = $this->upLoad($param, $carImg);
@@ -72,7 +71,7 @@ class CarControllerApi extends AbstractControllerApi
 
     private function upLoad($param, $carImg): array
     {
-        $result = $this->fileService->UploadToS3($carImg);
+        $result = $this->fileService->uploadToS3($carImg);
         if(isset($result['error'])){
             return $result;
 

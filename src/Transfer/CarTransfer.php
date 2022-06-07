@@ -70,15 +70,19 @@ class CarTransfer implements TransferInterface
 
     /**
      * @param string $image
+     * @return void
      */
     public function setImage(string $image): void
     {
         $this->image = $image;
     }
 
+    /**
+     * @param array $param
+     * @return TransferInterface
+     */
     public function fromArray(array $param): TransferInterface
     {
-        //$this->id = $param['id'] ?? null;
         $this->brand = $param['brand'] ?? null;
         $this->price = $param['price'] ?? null;
         $this->description = $param['description'] ?? null;
@@ -87,6 +91,11 @@ class CarTransfer implements TransferInterface
         return $this;
     }
 
+    /**
+     * @param Car $car
+     * @param $dir
+     * @return array
+     */
     public function toArray(Car $car, $dir): array
     {
         return [

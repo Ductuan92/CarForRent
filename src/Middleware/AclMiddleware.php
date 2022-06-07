@@ -3,13 +3,9 @@
 namespace MyApp\Middleware;
 
 use MyApp\App\Route;
-use MyApp\App\View;
 use MyApp\Http\Request;
 use MyApp\Repository\UserRepository;
-use MyApp\service\LoginService;
 use MyApp\service\TokenService;
-use MyApp\Exception\UnauthorizedException;
-use mysql_xdevapi\Exception;
 
 class AclMiddleware
 {
@@ -33,46 +29,52 @@ class AclMiddleware
         $this->userRepository = $userRepository;
     }
 
-    public function verify(Route $route): bool
+    /**
+     * @param Route $route
+     * @return array|string[]
+     */
+    public function verify(Route $route): array
     {
         $role = $route->getRole();
         if(empty($role)){
-            return true;
+            return [];
         }
         $uri = substr(Request::requestUri(), 1, 3);
         if($uri == 'api'){
-            $this->checkToken($role);
-            return true;
+            return $this->checkToken($role);
         }
-        try{
-            $this->checkSession($role);
-        } catch(\Exception $exception){
-            echo $exception->getMessage();
-            return false;
-        }
-        return true;
+        return $this->checkSession($role);
     }
 
-    private function checkToken($role): bool
+    /**
+     * @param $role
+     * @return array|string[]
+     */
+    private function checkToken($role): array
     {
         $authorizationToken = $this->request->getTokenHeader();
         $tokenPayload = $this->tokenService->getTokenPayload($authorizationToken);
         $userId = $tokenPayload['sub'];
         $user = $this->userRepository->searchById($userId);
         if ($user->getRole() === $role) {
-            return true;
+            return [];
         }
-        throw new UnauthorizedException('User are not permitted');
+        return ['User are not permitted'];
     }
-    private function checkSession($role): bool
+
+    /**
+     * @param $role
+     * @return array|string[]
+     */
+    private function checkSession($role): array
     {
         $session = $_SESSION['userName'] ?? null;
         if($session != null){
             $user = $this->userRepository->searchByUserName($_SESSION['userName']);
             if($user->getRole() == $role){
-                return true;
+                return [];
             }
         }
-        throw new UnauthorizedException('User are not permitted');
+        return ['User are not permitted'];
     }
 }

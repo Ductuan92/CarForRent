@@ -16,45 +16,45 @@ use MyApp\Validation\UserRequestValidation;
 class LoginControllerTest extends TestCase
 {
     /**
-     * @dataProvider indexDataProvider
+     * @dataProvider indexDataProvide
      * @return void
      */
     public function testIndex($param, $expected)
     {
-        $_SESSION["userName"] = $param['userName'];
-        $session = new Session();
-        $user = new User();
-        $userRepository = new UserRepository($user);
-        $loginService = new LoginService($userRepository);
-
-        $request = new Request();
         $response = new Response();
-        $userLoginRequest = new UserLoginRequest();
-        $userRequestValidation = new UserRequestValidation();
-        $loginController = new LoginController($request, $response, $loginService, $userLoginRequest, $userRequestValidation, $session);
+        $_SESSION["userName"] = $param['session'];
+        $response->setReDirect($expected['redirect']);
+        $response->view($expected['view']);
+
+        $loginController = $this->callLoginController();
         $result = $loginController->index();
-        var_dump($result);
-        $this->assertEquals($expected, $result);
+        $this->assertEquals($response, $result);
     }
 
-    public function indexDataProvider()
+    public function indexDataProvide()
     {
-        $response = new Response();
         return [
-//            'happy-case-1' => [
-//                'param' => [
-//                    'userName' => 'anh'
-//                ],
-//                'expected' => $response->view('index')
-//            ],
-            'unhappy-case-1' => [
-                'param' => [
-                    'userName' => ''
+          'happy-case-1'=>[
+              'param'=>[
+                  'session' => 'anh'
+              ],
+              'expected' => [
+                  'redirect'=>'/',
+                  'view'=>'index'
+              ]
+          ],
+            'unhappy-case-1'=>[
+                'param'=>[
+                    'session' => ''
                 ],
-                'expected' => $response->view('login')
+                'expected' => [
+                    'redirect'=>'',
+                    'view'=>'login'
+                ]
             ]
         ];
     }
+
 
     /**
      * @runInSeparateProcess
@@ -73,15 +73,11 @@ class LoginControllerTest extends TestCase
 
         $loginServiceMock = $this->getMockBuilder(LoginService::class)->disableOriginalConstructor()->getMock();
         $loginServiceMock->expects($this->once())->method('Login')->willReturn($user);
-
-        $request = new Request();
         $response = new Response();
-        $userLoginRequest = new UserLoginRequest();
-        $userRequestValidation = new UserRequestValidation();
-        $session = new Session();
-        $loginController = new LoginController($request, $response, $loginServiceMock, $userLoginRequest, $userRequestValidation, $session);
 
+        $loginController = $this->callLoginController($loginServiceMock);
         $result = $loginController->login();
+        $response->setReDirect('/');
         $expected = $response->view('index');
         $this->assertEquals($expected, $result);
     }
@@ -112,18 +108,11 @@ class LoginControllerTest extends TestCase
         $_POST['password'] = $param['password'];
         $_SERVER['REQUEST_URI'] = $param['uri'];
         $_SERVER['REQUEST_METHOD'] = $param['method'];
-        $user = new User();
-        $userRepository = new UserRepository($user);
-        $loginService = new LoginService($userRepository);
-        $session = new Session();
-
-        $request = new Request();
         $response = new Response();
-        $userLoginRequest = new UserLoginRequest();
-        $userRequestValidation = new UserRequestValidation();
-        $loginController = new LoginController($request, $response, $loginService, $userLoginRequest, $userRequestValidation, $session);
+
+        $loginController = $this->callLoginController();
         $result = $loginController->login();
-        $expected = $response->view('index');
+        $expected = $response->view('login');
         $this->assertEquals($expected, $result);
     }
 
@@ -137,14 +126,14 @@ class LoginControllerTest extends TestCase
                     'method' => 'POST',
                     'uri' => '/user/login'
                 ]
-            ],
-            'happy-case-2' => [
-                'param' => [
-                    'userName' => 'anh',
-                    'password' => '12345',
-                    'method' => 'POST',
-                    'uri' => '/user/login'
-                ]
+                ],
+                'happy-case-2' => [
+                    'param' => [
+                        'userName' => 'anh',
+                        'password' => '12345',
+                        'method' => 'POST',
+                        'uri' => '/user/login'
+                    ]
             ]
         ];
     }
@@ -155,21 +144,34 @@ class LoginControllerTest extends TestCase
      */
     public function testLogout()
     {
-
-        $user = new User();
-        $userRepository = new UserRepository($user);
-        $loginService = new LoginService($userRepository);
         $session = new Session();
         $session->setSessionName('3424');
-
-        $request = new Request();
         $response  = new Response();
-        $userLoginRequest = new UserLoginRequest();
-        $userRequestValidation = new UserRequestValidation();
-        $loginController = new LoginController($request, $response, $loginService, $userLoginRequest, $userRequestValidation, $session);
+
+        $loginController = $this->callLoginController();
         $result = $loginController->logout();
 
         $expected = $response->view('login');
         $this->assertEquals($expected, $result);
+    }
+
+    private function callLoginController($loginServiceMock = null)
+    {
+        $user = new User();
+        $userRepository = new UserRepository($user);
+
+        if($loginServiceMock)
+        {
+            $loginService = $loginServiceMock;
+        } else{
+            $loginService = new LoginService($userRepository);
+        }
+
+        $session = new Session();
+        $request = new Request();
+        $response  = new Response();
+        $userLoginRequest = new UserLoginRequest();
+        $userRequestValidation = new UserRequestValidation();
+        return new LoginController($request, $response, $loginService, $userLoginRequest, $userRequestValidation, $session);
     }
 }

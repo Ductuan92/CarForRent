@@ -41,11 +41,12 @@ class CarController extends AbstractController
     {
         $param = $this->request->getFormParams();
         $carImg = $this->request->getFile()['image'];
-
         $message = $this->carValidation->validate($param);
+
         if(empty($message)){
             $message = $this->upLoad($param, $carImg);
         }
+
         if(empty($message)){
             $message = ['success' => 'Car is added successfully!'];
         }
@@ -59,7 +60,7 @@ class CarController extends AbstractController
      */
     private function upLoad($param, $carImg): array
     {
-        $result = $this->fileService->UploadToS3($carImg);
+        $result = $this->fileService->uploadToS3($carImg);
         if(isset($result['error'])){
             return $result;
 

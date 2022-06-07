@@ -16,8 +16,10 @@ class UserRequestValidationTest extends TestCase
         $userRequest = new UserLoginRequest();
         $userRequest->setUserName($param['userName']);
         $userRequest->setPassword($param['password']);
+
         $userRequestValidation = new UserRequestValidation();
         $result = $userRequestValidation->validateEmptyUserNamePassword($userRequest);
+
         $this->assertEquals($result,$expected);
     }
 

@@ -28,6 +28,7 @@ class UserLoginControllerApi extends AbstractControllerApi
         Request $request,
         TokenService $token,
     )
+
     {
         parent::__construct($response, $request);
         $this->loginService = $loginService;
@@ -44,6 +45,7 @@ class UserLoginControllerApi extends AbstractControllerApi
         $params = $this->request->getParams();
         $this->userLoginRequest->setUserName($params['username']);
         $this->userLoginRequest->setPassword($params['password']);
+
         if(!empty($this->checkUserRequest())){
             return $this->response->error([$this->checkUserRequest()]);
         }
@@ -52,7 +54,7 @@ class UserLoginControllerApi extends AbstractControllerApi
             return $this->response->error(["username or password is incorrect"]);
         }
         $token = $this->token->generate($user);
-        return $this->response->success([$token]);
+        return $this->response->success(['token'=>$token]);
     }
 
     /**

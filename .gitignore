@@ -5,9 +5,9 @@
 /phpunit.phar/
 /composer.phar/
 .DS_Store
-/src/.env
-/phpunit.xml
+.env
+phpunit.xml
 /.phpunit.cache
 /coverage
 /.phpunit.result.cache
-/psalm.xml
+/.psalm.xml
